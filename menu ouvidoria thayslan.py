@@ -1,11 +1,7 @@
 from operacoesbd import *
 from mainOuvidoria import *
 
-tiposManifestacao = {
-    1: "Reclamação",
-    2: "Elogio",
-    3: "Melhoria"
-    }
+
 
 conn = criarConexao ("127.0.0.1","root","12345","ouvidoria")
 
@@ -39,34 +35,18 @@ while True:
                       f"- Tipo: {item[3]}\n"
                       )
         else:
-            print("Não há manifestações cadastradas!.\n")
+            print("Não há manifestações cadastradas!\n")
             continue
     
     #Listar manifestações por tipo:
     elif opcao == 2:
-        while True:
-            try:
-                #User informa o tipo de manifestação que ele está buscando (Reclamação, Elogio, Melhoria)
-                tipoInput = int(input("Digite 1 para Reclamações \n"
-                                              "Digite 2 para Elogios \n"
-                                              "Digite 3 para Melhorias \n"
-                                              "Digite 4 para retornar ao menu \n"
-                                              "Informe o tipo de manifestação que você está buscando: "))
+        while True:            
+            #User informa o tipo a ser buscado
+            userTipoInformado = escolherTipoManifestacao()
+            if not userTipoInformado:
+                print("Retornando ao menu...\n")
+                continue
 
-                if tipoInput == 4:
-                    print("Retornando ao menu...")
-                    break
-
-                userTipoInformado = tiposManifestacao.get(tipoInput)
-                
-                if not userTipoInformado:
-                    print("Opção inválida. Tente novamente!")
-                    continue
-                       
-            except ValueError:
-                print("Erro! Número digitado é iválido!\n") 
-                continue       
-                                
             consultaManifestacoesTipo = "SELECT * FROM manifestacoes WHERE tipo = %s"
             dados = [userTipoInformado]
             listaManifestacoesTipo = listarBancoDados(conn,consultaManifestacoesTipo, dados)                   
@@ -85,30 +65,14 @@ while True:
     #Criar uma nova manifestação:
     elif opcao == 3:
         print("Criar nova manifestação.")
-        while True:
-            try:
-                #User informa o tipo de manifestação que ele quer incluir (Reclamação, Elogio, Melhoria) ou retornar ao menu
-                tipoCriarInput = int(input("Digite 1 para Reclamações \n"
-                                              "Digite 2 para Elogios \n"
-                                              "Digite 3 para Melhorias \n"
-                                              "Digite 4 para retornar ao menu \n"
-                                              "Informe o tipo de manifestação que você quer adicionar: "))
-                
-                if tipoCriarInput == 4:
-                    print("Retornando ao menu...")
-                    break
+        #User informa o tipo da nova manifestação:
+        userTipoCriar = escolherTipoManifestacao()
 
-                userTipoCriar = tiposManifestacao.get(tipoCriarInput)
+        if not userTipoCriar:
+            print("Retornando ao menu...\n")
+            continue
 
-                if not userTipoCriar:
-                    print("Erro! Tente novamente!")
-                    continue
-                break
-
-            except ValueError:
-                print("Erro! Número digitado é iválido!\n")      
-
-        #user informa autor, descrição e ouvidor da nova manifestação
+        #user informa autor, descrição e ouvidor da nova manifestação:
         while True:
             autor = input("Informe o autor(a) da manifestação: ")
             descricao = input("Informe a manifestação: ")
