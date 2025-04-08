@@ -24,152 +24,26 @@ while True:
 
     #Listagem de manifestações cadastradas:
     if opcao == 1:       
-        consultaListaManifestacoes = "SELECT * FROM manifestacoes"
-        listaManifestacoes = listarBancoDados(conn,consultaListaManifestacoes)
-
-        if len(listaManifestacoes) > 0:
-            print("Lista de manifestações:")  
-            for item in listaManifestacoes:
-                print(f"Manifestação {item[0]}:\n"
-                      f"- Descrição: {item[2]}\n"
-                      f"- Tipo: {item[3]}\n"
-                      )
-        else:
-            print("Não há manifestações cadastradas!\n")
-            continue
+        listarManifestacoes(conn)
     
     #Listar manifestações por tipo:
     elif opcao == 2:
-        while True:            
-            #User informa o tipo a ser buscado
-            userTipoInformado = escolherTipoManifestacao()
-            if not userTipoInformado:
-                print("Retornando ao menu...\n")
-                continue
-
-            consultaManifestacoesTipo = "SELECT * FROM manifestacoes WHERE tipo = %s"
-            dados = [userTipoInformado]
-            listaManifestacoesTipo = listarBancoDados(conn,consultaManifestacoesTipo, dados)                   
-
-            #Listagem das manifestações com as colunas "Manifestação" e "Descrição"
-            if len(listaManifestacoesTipo) > 0:
-                print("Lista de manifestações:")  
-                for item in listaManifestacoesTipo:
-                    print(f"Manifestação {item[0]}:\n"
-                        f"- Descrição: {item[2]}\n"
-                        )
-            else:
-                print("Não há manifestações cadastradas!.\n")
-                continue
+        listarManifestacoesPorTipo(conn)
     
     #Criar uma nova manifestação:
     elif opcao == 3:
-        print("Criar nova manifestação.")
-        #User informa o tipo da nova manifestação:
-        userTipoCriar = escolherTipoManifestacao()
-
-        if not userTipoCriar:
-            print("Retornando ao menu...\n")
-            continue
-
-        #user informa autor, descrição e ouvidor da nova manifestação:
-        while True:
-            autor = input("Informe o autor(a) da manifestação: ")
-            descricao = input("Informe a manifestação: ")
-            ouvidor = input("Informe o ouvidor(a): ")
-            
-            if not autor.strip() or not descricao.strip() or not ouvidor.strip():
-                print("Erro. Nenhum campo pode estar vazio!")
-                continue
-            break
-
-        consultaNovaManifestacao = "INSERT INTO manifestacoes (autor, descricao, tipo, ouvidor) VALUES (%s, %s, %s, %s)"
-        dados = [autor, descricao, userTipoCriar, ouvidor]
-        result = insertNoBancoDados(conn, consultaNovaManifestacao, dados)
-        
-        #feedback para o user
-        if result:
-            print(f"Manifestação cadastrada com sucesso!\n"
-                  f"Código: {result}\n"
-                  f"Autor(a): {autor}\n"
-                  f"Descrição: {descricao}\n")
-        else:
-            print("Erro ao adicionar a manifestação. Por favor tente novamente.")
-            continue
+        criarNovaManifestacao(conn)
 
     elif opcao == 4:
-
-        consultaQuantidadeManifestacoes = "SELECT COUNT(*) FROM manifestacoes"
-        quantidadeManifestacoes = listarBancoDados(conn, consultaQuantidadeManifestacoes)
-        print(f"A quantidade de manifestações cadastradas é de {quantidadeManifestacoes[0][0]}\n")
+        exibirQuantidadeManifestacoes(conn)
 
     #Pesquisar manifestação por código
     elif opcao == 5:       
-        while True:
-            try:
-                codigoPesquisa = int(input("Informe o código a ser buscado: "))
-            except ValueError:
-                print("Código informado é inválido. Tente Novamente\n")
-                continue
-            
-            consultaCodigo = "SELECT * FROM manifestacoes WHERE codigo = %s"
-            dados = [codigoPesquisa]
-            resultPesquisaCodigo = listarBancoDados (conn, consultaCodigo, dados)
-
-            if not resultPesquisaCodigo:
-                print("Manifestação não encontrada! Verifique o código e tente novamente.\n")
-                continue
-
-            manifestacaoEncontrada = resultPesquisaCodigo [0]
-
-            #feedback para o user
-            print(f"\n Manifestação encontrada com sucesso!\n"
-                  f"Código: {manifestacaoEncontrada[0]}\n"
-                  f"Tipo: {manifestacaoEncontrada[3]}\n"
-                  f"Autor: {manifestacaoEncontrada[1]}\n"
-                  f"Descrição: {manifestacaoEncontrada[2]}\n"
-                  f"Ouvidor: {manifestacaoEncontrada[4]}\n")
-            break
+        pesquisaManifestacaoCodigo(conn)
     
     #Excluir manifestação por código
     elif opcao == 6:
-        while True:
-            #User informa código:
-            try:
-                codigoDelete = int(input("Informe o código da manifestação a ser removida: "))
-            except ValueError:
-                print("Código informado é inválido. Tente Novamente\n")
-                continue
-            
-            #Consulta se código existe no BD:
-            consultaCodigoExiste = "SELECT * FROM manifestacoes WHERE codigo = %s"
-            result = listarBancoDados(conn, consultaCodigoExiste, [codigoDelete])
-
-            if not result:
-                print ("Código não encontrado! Verifique e tente novamente.")
-                continue
-            
-            #Confirma a operação com o user:
-            manifestacao = result [0]
-            confirmacao = input(f"Código: {manifestacao [0]}\n"
-                                f"Autor: {manifestacao [1]}\n"
-                                f"Descrição: {manifestacao [2]}\n"
-                                "Tem certeza que deseja excluir a manifestação acima?\n"
-                                "Sim (digite: s)\n"
-                                "Não (digite: n)\n")
-            confirmacao = confirmacao.lower().strip()
-            #Exclui manifestação do BD:
-            if confirmacao == "s":
-                
-                consultaDelete = "DELETE FROM manifestacoes WHERE codigo = %s"
-                linhasAlteradas = excluirBancoDados(conn, consultaDelete, [codigoDelete])
-            
-                #Feedback para o user
-                if linhasAlteradas == 0:
-                    print("Erro! Tente novamente.")
-                else:
-                    print("Manifestação excluída com sucesso!")
-                    break        
+        excluirManifestacaoPorCodigo(conn)
     
     elif opcao == 7:
         print("Agradecemos à preferência!")
