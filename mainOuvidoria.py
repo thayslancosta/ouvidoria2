@@ -12,7 +12,7 @@ def opcaoUser():
             print("Erro! Digite um número válido.")
 
 #Dicionário com os tipos de manifestação (colunas do BD)
-tiposManifestacao = {
+tiposManifestacao ={
     1: "Reclamação",
     2: "Elogio",
     3: "Melhoria"
@@ -66,7 +66,7 @@ def listarManifestacoesPorTipo(conn):
             break
 
         consultaManifestacoesTipo = "SELECT * FROM manifestacoes WHERE tipo = %s"
-        dados = [userTipoInformado]
+        dados =[userTipoInformado]
         listaManifestacoesTipo = listarBancoDados(conn,consultaManifestacoesTipo, dados)                   
 
         #Listagem das manifestações com as colunas "Manifestação" e "Descrição"
@@ -136,7 +136,7 @@ def pesquisaManifestacaoCodigo(conn):
             print("Manifestação não encontrada! Verifique o código e tente novamente.\n")
             continue
 
-        manifestacaoEncontrada = resultPesquisaCodigo [0]
+        manifestacaoEncontrada = resultPesquisaCodigo[0]
 
         #feedback para o user
         print(f"\n Manifestação encontrada com sucesso!\n"
